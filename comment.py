@@ -52,7 +52,6 @@ def comment(lines_code, input, symbol, inverse):
     _click.echo(sub_lines('^', symbol, input.read(), expand_line_numbers(lines_code), inverse))
 
 
-
 @cli.command()
 @_click.argument('lines_code')
 @_click.argument('input', type=_click.File('r'))
@@ -61,6 +60,26 @@ def comment(lines_code, input, symbol, inverse):
 def uncomment(lines_code, input, symbol, inverse):
     """Uncomment lines by line number."""
     _click.echo(sub_lines('^' +symbol, '', input.read(), expand_line_numbers(lines_code), inverse))
+
+
+@cli.command()
+@_click.argument('lines_code')
+@_click.argument('input', type=_click.File('r'))
+@_click.option('-i', '--inverse', is_flag=True, help='Delete the lines that are not in the list.')
+def delete(lines_code, input, inverse):
+    """Delete lines by line number."""
+    data_lines = input.read().strip('\n').split('\n')
+    max_number = len(data_lines)
+    line_numbers = expand_line_numbers(lines_code)
+    if inverse:
+        line_numbers = complement(line_numbers, 1, max_number)
+    line_numbers.sort()
+    line_numbers.reverse()
+    for ln in line_numbers:
+        # Convert to zero base index
+        ln = ln - 1    
+        del data_lines[ln]
+    _click.echo('\n'.join(data_lines))
     
     
 if __name__ == '__main__':
